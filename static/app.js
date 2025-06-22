@@ -50,6 +50,7 @@ function showScreen(screenId) {
     // Hide all screens
     const screens = document.querySelectorAll('.screen');
     screens.forEach(screen => {
+        screen.classList.remove('active');
         screen.style.display = 'none';
     });
 
@@ -57,6 +58,9 @@ function showScreen(screenId) {
     const targetScreen = document.getElementById(screenId + '-screen');
     if (targetScreen) {
         targetScreen.style.display = 'block';
+        // Force a reflow to ensure the display change is applied
+        targetScreen.offsetHeight;
+        targetScreen.classList.add('active');
         currentScreen = screenId;
     }
 }
