@@ -2,7 +2,7 @@ modules = ["dotnet-7.0", "swift-5.8", "python-3.11", "nodejs-20", "web"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["freetype", "lcms2", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "tcl", "tk", "zlib", "mesa", "libGL", "libglvnd"]
+packages = ["freetype", "lcms2", "libGL", "libGLU", "libglvnd", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "mesa", "openjpeg", "tcl", "tk", "zlib"]
 
 [workflows]
 runButton = "Project"

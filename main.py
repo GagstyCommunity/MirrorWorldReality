@@ -17,7 +17,7 @@ from PIL import Image
 import io
 import base64
 
-from api.processing_simple import PhotoProcessor
+from api.processing_real import PhotoProcessor
 from api.models import ProcessingStatus, Avatar3DModel
 from config import Settings
 

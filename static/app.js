@@ -37,6 +37,12 @@ function initializeEventListeners() {
 // Add missing startOnboarding function
 function startOnboarding() {
     console.log('Starting onboarding process...');
+    showScreen('onboarding');
+}
+
+// Add missing requestPermissions function
+function requestPermissions() {
+    console.log('Requesting permissions...');
     showScreen('upload');
 }
 
@@ -144,38 +150,63 @@ function monitorProcessing() {
 
 function updateProcessingUI(status) {
     const progressBar = document.getElementById('progress-bar');
-    const progressText = document.getElementById('progress-text');
-    const statusMessage = document.getElementById('status-message');
+    const processingMessage = document.getElementById('processing-message');
 
     if (progressBar) {
         progressBar.style.width = status.progress + '%';
         progressBar.setAttribute('aria-valuenow', status.progress);
     }
 
-    if (progressText) {
-        progressText.textContent = Math.round(status.progress) + '%';
+    if (processingMessage) {
+        processingMessage.textContent = status.message || 'Processing...';
     }
 
-    if (statusMessage) {
-        statusMessage.textContent = status.message || 'Processing...';
-    }
+    // Update processing step indicators
+    const steps = document.querySelectorAll('.step-badge');
+    const currentStep = Math.floor((status.progress / 100) * steps.length);
+    
+    steps.forEach((step, index) => {
+        if (index <= currentStep) {
+            step.classList.add('completed');
+        } else {
+            step.classList.remove('completed');
+        }
+    });
 }
 
 function loadAvatar(avatarData) {
     try {
-        showScreen('avatar');
+        showScreen('scene');
 
         // Initialize 3D scene with avatar data
-        if (typeof initializeScene === 'function') {
-            initializeScene(avatarData);
+        if (window.SceneManager) {
+            window.SceneManager.loadAvatar(avatarData);
         } else {
-            console.warn('3D scene initialization not available');
+            console.warn('3D scene manager not available');
         }
 
     } catch (error) {
         console.error('Avatar loading error:', error);
         showError('Failed to load avatar: ' + error.message);
     }
+}
+
+// Add missing functions
+function resetCamera() {
+    if (window.SceneManager) {
+        window.SceneManager.resetCamera();
+    }
+}
+
+function captureScreenshot() {
+    if (window.SceneManager) {
+        window.SceneManager.captureScreenshot();
+    }
+}
+
+function startOver() {
+    resetApplication();
+    showScreen('welcome');
 }
 
 function showError(message) {

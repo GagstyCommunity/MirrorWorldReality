@@ -297,6 +297,24 @@ body {
     color: white;
 }
 
+.step-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.step-badge.completed {
+    background: rgba(40, 167, 69, 0.3);
+    border-color: #28a745;
+    color: #fff;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .welcome-content h1 {
