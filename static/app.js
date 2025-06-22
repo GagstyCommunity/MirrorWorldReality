@@ -320,14 +320,16 @@ let processingInterval = null;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    feather.replace();
-
-    // Set up event listeners
-    document.getElementById('photo-input').addEventListener('change', handlePhotoSelection);
-
-    // Initialize screens
-    showScreen('upload');
+    initializeFeatherIcons();
+    initializeFileUpload();
+    initializeEventListeners();
 });
+
+// Add missing startOnboarding function
+function startOnboarding() {
+    console.log('Starting onboarding process...');
+    // This function can be expanded later for tutorial functionality
+}
 
 function startOnboarding() {
     // Implementation for onboarding flow
@@ -499,8 +501,3 @@ function updateProcessingUI(progress, message, currentStep) {
 
     feather.replace();
 }
-```
-
-**Analysis:**
-
-The code integrates image quality analysis, enhanced 3D processing status updates, and fixes JavaScript errors, aiming to improve the user experience and provide better feedback during the 3D avatar generation process. Notably, the code includes functions for onboarding, handling photo selection with validation, analyzing image quality, and updating the processing UI with enhanced messaging and visual feedback.
