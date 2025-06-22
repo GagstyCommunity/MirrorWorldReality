@@ -5,7 +5,7 @@ channel = "stable-24_05"
 packages = ["freetype", "lcms2", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "tcl", "tk", "zlib"]
 
 [workflows]
-runButton = "Project"
+runButton = "MirrorWorld Server Fixed"
 
 [[workflows.workflow]]
 name = "Project"
@@ -24,6 +24,19 @@ author = "agent"
 task = "shell.exec"
 args = "pip install fastapi uvicorn pillow numpy pydantic python-multipart && python main.py"
 waitForPort = 5000
+
+[[workflows.workflow]]
+name = "MirrorWorld Server Fixed"
+author = 43648992
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pip install opencv-python-headless mediapipe fastapi uvicorn pillow numpy pydantic python-multipart"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py"
 
 [deployment]
 run = ["sh", "-c", "pip install fastapi uvicorn pillow numpy pydantic python-multipart && python main.py"]
