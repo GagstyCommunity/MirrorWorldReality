@@ -26,12 +26,21 @@ class PhotoProcessor:
         self.models_loaded = False
         self.mp_face_mesh = mp.solutions.face_mesh
         self.mp_drawing = mp.solutions.drawing_utils
-        self.face_mesh = self.mp_face_mesh.FaceMesh(
-            static_image_mode=True,
-            max_num_faces=1,
-            refine_landmarks=True,
-            min_detection_confidence=0.5
-        )
+        try:
+            self.face_mesh = self.mp_face_mesh.FaceMesh(
+                static_image_mode=True,
+                max_num_faces=1,
+                refine_landmarks=True,
+                min_detection_confidence=0.5
+            )
+        except Exception as e:
+            logger.warning(f"Failed to initialize face mesh with GPU, trying CPU-only: {e}")
+            # Fallback to basic configuration
+            self.face_mesh = self.mp_face_mesh.FaceMesh(
+                static_image_mode=True,
+                max_num_faces=1,
+                min_detection_confidence=0.5
+            )
         self._load_models()
     
     def _load_models(self):

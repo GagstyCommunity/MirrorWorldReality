@@ -1,8 +1,13 @@
+import os
+# Set environment variables before importing any MediaPipe dependencies
+os.environ['MEDIAPIPE_DISABLE_GPU'] = '1'
+os.environ['OPENCV_IO_ENABLE_OPENEXR'] = '1'
+os.environ['CUDA_VISIBLE_DEVICES'] = ''
+
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse, Response
 import uvicorn
-import os
 import json
 import asyncio
 import uuid
@@ -12,7 +17,7 @@ from PIL import Image
 import io
 import base64
 
-from api.processing import PhotoProcessor
+from api.processing_simple import PhotoProcessor
 from api.models import ProcessingStatus, Avatar3DModel
 from config import Settings
 

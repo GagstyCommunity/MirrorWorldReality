@@ -1,11 +1,11 @@
-modules = ["python-3.11"]
+modules = ["dotnet-7.0", "swift-5.8", "python-3.11", "nodejs-20", "web"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["freetype", "lcms2", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "tcl", "tk", "zlib"]
+packages = ["freetype", "lcms2", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "tcl", "tk", "zlib", "mesa", "libGL", "libglvnd"]
 
 [workflows]
-runButton = "MirrorWorld Server Fixed"
+runButton = "Project"
 
 [[workflows.workflow]]
 name = "Project"
@@ -22,7 +22,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "pip install fastapi uvicorn pillow numpy pydantic python-multipart && python main.py"
+args = "python main.py"
 waitForPort = 5000
 
 [[workflows.workflow]]
@@ -39,7 +39,7 @@ task = "shell.exec"
 args = "python main.py"
 
 [deployment]
-run = ["sh", "-c", "pip install fastapi uvicorn pillow numpy pydantic python-multipart && python main.py"]
+run = ["sh", "-c", "python main.py"]
 
 [[ports]]
 localPort = 5000
