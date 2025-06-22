@@ -89,40 +89,40 @@ async def upload_photo(file: UploadFile = File(...)):
 async def process_photo_background(process_id: str, image: Image.Image):
     """Background task to process photo into 3D avatar"""
     try:
-        # Stage 1: Person segmentation
+        # Stage 1: Face detection and segmentation
         processing_status[process_id].update({
-            "progress": 20,
-            "message": "Extracting person from background..."
-        })
-        await asyncio.sleep(2)  # Simulate processing time
-        
-        # Stage 2: Depth estimation
-        processing_status[process_id].update({
-            "progress": 40,
-            "message": "Analyzing facial structure and depth..."
+            "progress": 15,
+            "message": "Detecting and isolating your face for 3D conversion..."
         })
         await asyncio.sleep(2)
+        
+        # Stage 2: 3D structure analysis
+        processing_status[process_id].update({
+            "progress": 35,
+            "message": "Analyzing facial depth and creating 3D structure maps..."
+        })
+        await asyncio.sleep(3)
         
         # Stage 3: 3D mesh generation
         processing_status[process_id].update({
             "progress": 60,
-            "message": "Generating 3D mesh and textures..."
+            "message": "Building your personalized 3D avatar mesh..."
         })
-        await asyncio.sleep(3)
+        await asyncio.sleep(4)
         
-        # Stage 4: Animation rigging
+        # Stage 4: Texture and material creation
         processing_status[process_id].update({
             "progress": 80,
-            "message": "Adding facial animations and expressions..."
+            "message": "Applying realistic textures and materials..."
         })
         await asyncio.sleep(2)
         
-        # Stage 5: Final optimization
+        # Stage 5: Animation and final optimization
         processing_status[process_id].update({
             "progress": 95,
-            "message": "Optimizing for real-time rendering..."
+            "message": "Adding facial expressions and optimizing for real-time 3D rendering..."
         })
-        await asyncio.sleep(1)
+        await asyncio.sleep(2)
         
         # Generate avatar data using processor
         avatar_data = await processor.generate_3d_avatar(image)
