@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MirrorWorld - Your 3D Avatar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="screen active">
+            <div class="container-fluid h-100">
+                <div class="row h-100 align-items-center justify-content-center">
+                    <div class="col-md-6 text-center">
+                        <div class="welcome-content">
+                            <div class="app-icon mb-4">
+                                <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+                                    <circle cx="50" cy="50" r="45" fill="url(#gradient)" stroke="#fff" stroke-width="2"/>
+                                    <circle cx="35" cy="40" r="8" fill="#fff"/>
+                                    <circle cx="65" cy="40" r="8" fill="#fff"/>
+                                    <path d="M35 65 Q50 75 65 65" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+                                    <defs>
+                                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#667eea"/>
+                                            <stop offset="100%" style="stop-color:#764ba2"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </div>
+                            <h1 class="display-4 mb-3">MirrorWorld</h1>
+                            <p class="lead mb-4">Transform your photo into a photorealistic 3D avatar living in a beautiful virtual park</p>
+                            <p class="text-muted mb-4">Experience yourself in 3D - breathing, blinking, alive in a virtual memory</p>
+                            <button class="btn btn-primary btn-lg" onclick="startOnboarding()">
+                                <i data-feather="camera" class="me-2"></i>
+                                Get Started
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onboarding Screen -->
+        <div id="onboarding-screen" class="screen">
+            <div class="container-fluid h-100">
+                <div class="row h-100">
+                    <div class="col-md-6 onboarding-steps">
+                        <div class="p-5">
+                            <h2 class="mb-4">How it works</h2>
+                            <div class="step-item active" data-step="1">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h5>Upload Your Photo</h5>
+                                    <p>Take a new photo or choose from your gallery. We need a clear view of your face for best results.</p>
+                                </div>
+                            </div>
+                            <div class="step-item" data-step="2">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h5>AI Processing</h5>
+                                    <p>Our advanced AI analyzes your photo and creates a detailed 3D model with realistic textures and animations.</p>
+                                </div>
+                            </div>
+                            <div class="step-item" data-step="3">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h5>Enter Your World</h5>
+                                    <p>See yourself come alive in a beautiful virtual park with cinematic lighting and natural movements.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-center justify-content-center bg-light">
+                        <div class="text-center">
+                            <div class="mb-4">
+                                <i data-feather="shield-check" class="text-success" style="width: 64px; height: 64px;"></i>
+                            </div>
+                            <h4>Privacy First</h4>
+                            <p class="text-muted">Your photos are processed securely and never stored permanently. Only you can see your 3D avatar.</p>
+                            <button class="btn btn-success btn-lg mt-3" onclick="requestPermissions()">
+                                Continue
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Photo Upload Screen -->
+        <div id="upload-screen" class="screen">
+            <div class="container-fluid h-100">
+                <div class="row h-100 align-items-center justify-content-center">
+                    <div class="col-md-8 col-lg-6">
+                        <div class="upload-card text-center p-5">
+                            <h2 class="mb-4">Upload Your Photo</h2>
+                            <div id="photo-preview" class="photo-preview mb-4" style="display: none;">
+                                <img id="preview-image" src="" alt="Preview" class="img-fluid rounded">
+                            </div>
+                            <div id="upload-area" class="upload-area mb-4">
+                                <i data-feather="camera" class="upload-icon mb-3"></i>
+                                <h5>Choose a photo</h5>
+                                <p class="text-muted">Select a clear photo where your face is visible</p>
+                                <input type="file" id="photo-input" accept="image/*" style="display: none;">
+                                <button class="btn btn-outline-primary me-2" onclick="document.getElementById('photo-input').click()">
+                                    Choose from Gallery
+                                </button>
+                            </div>
+                            <button id="process-btn" class="btn btn-primary btn-lg" style="display: none;" onclick="processPhoto()">
+                                <i data-feather="zap" class="me-2"></i>
+                                Create My Avatar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Processing Screen -->
+        <div id="processing-screen" class="screen">
+            <div class="container-fluid h-100">
+                <div class="row h-100 align-items-center justify-content-center">
+                    <div class="col-md-6 text-center">
+                        <div class="processing-content">
+                            <div class="processing-animation mb-4">
+                                <div class="spinner"></div>
+                            </div>
+                            <h3 id="processing-title">Creating Your Avatar</h3>
+                            <p id="processing-message" class="text-muted mb-4">Analyzing your photo...</p>
+                            <div class="progress mb-3" style="height: 8px;">
+                                <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                                     role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <div id="processing-steps" class="processing-steps">
+                                <div class="step-badge" data-step="segmentation">Person Segmentation</div>
+                                <div class="step-badge" data-step="depth">Depth Analysis</div>
+                                <div class="step-badge" data-step="mesh">3D Mesh Generation</div>
+                                <div class="step-badge" data-step="animation">Animation Rigging</div>
+                                <div class="step-badge" data-step="optimization">Optimization</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3D Scene Screen -->
+        <div id="scene-screen" class="screen">
+            <div class="scene-container">
+                <div id="three-container"></div>
+                <div class="scene-controls">
+                    <button class="btn btn-light btn-sm" onclick="resetCamera()">
+                        <i data-feather="rotate-ccw"></i>
+                    </button>
+                    <button class="btn btn-light btn-sm" onclick="captureScreenshot()">
+                        <i data-feather="camera"></i>
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="startOver()">
+                        <i data-feather="home"></i> New Avatar
+                    </button>
+                </div>
+                <div class="scene-info">
+                    <h4>Your Avatar in Paradise Park</h4>
+                    <p>Drag to rotate • Scroll to zoom</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="app.js"></script>
+    <script src="scene.js"></script>
+</body>
+</html>
