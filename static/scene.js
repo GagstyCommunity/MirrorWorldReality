@@ -16,15 +16,18 @@ class SceneManager {
     async init() {
         // Wait for Three.js to be ready
         if (typeof THREE === 'undefined') {
+            console.log('Waiting for Three.js to load...');
             setTimeout(() => this.init(), 100);
             return;
         }
         
+        console.log('Initializing 3D scene...');
         this.setupScene();
         this.setupLighting();
         await this.createParkEnvironment();
         this.setupControls();
         this.startRenderLoop();
+        console.log('3D scene initialized successfully');
     }
     
     setupScene() {
@@ -49,7 +52,23 @@ class SceneManager {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this.renderer.outputEncoding = THREE.sRGBEncoding;
+        this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+        
+        // Append to container
+        const container = document.getElementById('three-container');
+        if (container) {
+            container.appendChild(this.renderer.domElement);
+            console.log('Renderer added to DOM');
+        } else {
+            console.error('three-container not found');
+        }
+        
+        // Debug: Add a simple test cube to verify rendering works
+        const testGeometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+        const testMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
+        const testCube = new THREE.Mesh(testGeometry, testMaterial);
+        testCube.position.set(1, 1, 0);
+        this.scene.add(testCube);
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 1.2;
         
@@ -379,8 +398,8 @@ class SceneManager {
         rightLeg.castShadow = true;
         this.avatarModel.add(rightLeg);
         
-        // Position avatar on the bench
-        this.avatarModel.position.set(0, 0.5, -1);
+        // Position avatar prominently in scene
+        this.avatarModel.position.set(0, 0.5, 0);
         
         // Add to scene
         this.scene.add(this.avatarModel);
@@ -398,6 +417,8 @@ class SceneManager {
     
     createRealisticHead(avatarData) {
         try {
+            console.log('Avatar data received:', avatarData);
+            
             // Create geometry from real facial landmarks
             const geometry = new THREE.BufferGeometry();
             
@@ -405,7 +426,12 @@ class SceneManager {
             const vertices = avatarData.vertices;
             const faces = avatarData.faces;
             
-            console.log('Creating realistic head with', vertices.length, 'vertices');
+            if (!vertices || !faces || vertices.length === 0) {
+                console.error('Invalid avatar data - missing vertices or faces');
+                throw new Error('Invalid avatar data');
+            }
+            
+            console.log('Creating realistic head with', vertices.length, 'vertices and', faces.length, 'faces');
             
             // Convert vertices to Float32Array
             const positions = new Float32Array(vertices.length * 3);
@@ -420,9 +446,14 @@ class SceneManager {
             const indices = [];
             for (let i = 0; i < faces.length; i++) {
                 if (faces[i].length >= 3) {
-                    indices.push(faces[i][0], faces[i][1], faces[i][2]);
+                    // Ensure indices are within bounds
+                    const v0 = Math.min(faces[i][0], vertices.length - 1);
+                    const v1 = Math.min(faces[i][1], vertices.length - 1);
+                    const v2 = Math.min(faces[i][2], vertices.length - 1);
+                    indices.push(v0, v1, v2);
                 }
             }
+            console.log('Created', indices.length / 3, 'triangular faces');
             geometry.setIndex(indices);
             
             // Add UV coordinates if available
@@ -437,6 +468,10 @@ class SceneManager {
             
             // Calculate normals for proper lighting
             geometry.computeVertexNormals();
+            geometry.computeBoundingBox();
+            
+            console.log('Geometry created with', positions.length/3, 'vertices and', indices.length/3, 'faces');
+            console.log('Bounding box:', geometry.boundingBox);
             
             // Create material with user's photo texture
             let material;
@@ -444,7 +479,13 @@ class SceneManager {
                 const textureLoader = new THREE.TextureLoader();
                 const texture = textureLoader.load(
                     'data:image/png;base64,' + avatarData.textures.diffuse,
-                    () => console.log('Photo texture loaded successfully')
+                    (tex) => {
+                        console.log('Photo texture loaded successfully', tex.image.width, 'x', tex.image.height);
+                        // Force render update when texture loads
+                        if (this.renderer) this.renderer.render(this.scene, this.camera);
+                    },
+                    undefined,
+                    (error) => console.error('Failed to load texture:', error)
                 );
                 texture.wrapS = THREE.ClampToEdgeWrapping;
                 texture.wrapT = THREE.ClampToEdgeWrapping;
@@ -453,9 +494,11 @@ class SceneManager {
                 material = new THREE.MeshPhongMaterial({
                     map: texture,
                     shininess: 30,
-                    side: THREE.DoubleSide
+                    side: THREE.DoubleSide,
+                    transparent: false
                 });
             } else {
+                console.warn('No texture data found, using default material');
                 material = new THREE.MeshPhongMaterial({
                     color: 0xFFDBB3,
                     shininess: 30,
@@ -467,10 +510,13 @@ class SceneManager {
             mesh.castShadow = true;
             mesh.receiveShadow = true;
             
-            // Scale to appropriate size
-            mesh.scale.set(2, 2, 2);
+            // Scale and position properly for visibility
+            mesh.scale.set(3, 3, 3);
+            mesh.position.set(0, 1.5, 0);
             
             console.log('Successfully created realistic head mesh');
+            console.log('Mesh bounding box:', mesh.geometry.boundingBox);
+            
             return mesh;
             
         } catch (error) {
