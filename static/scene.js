@@ -55,20 +55,13 @@ class SceneManager {
         this.renderer.outputColorSpace = THREE.SRGBColorSpace;
         
         // Append to container
-        const container = document.getElementById('three-container');
-        if (container) {
-            container.appendChild(this.renderer.domElement);
+        const sceneContainer = document.getElementById('three-container');
+        if (sceneContainer) {
+            sceneContainer.appendChild(this.renderer.domElement);
             console.log('Renderer added to DOM');
         } else {
             console.error('three-container not found');
         }
-        
-        // Debug: Add a simple test cube to verify rendering works
-        const testGeometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-        const testMaterial = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-        const testCube = new THREE.Mesh(testGeometry, testMaterial);
-        testCube.position.set(1, 1, 0);
-        this.scene.add(testCube);
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 1.2;
         

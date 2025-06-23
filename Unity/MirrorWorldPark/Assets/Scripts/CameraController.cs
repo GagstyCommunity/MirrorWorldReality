@@ -1,144 +1,112 @@
-using System.Collections;
 using UnityEngine;
+using System.Collections;
 
 namespace MirrorWorld
 {
     public class CameraController : MonoBehaviour
     {
-        [Header("Camera Settings")]
-        public Transform target;
+        [Header("Camera Configuration")]
+        public Transform target; // Avatar to follow
         public float distance = 5f;
-        public float minDistance = 2f;
-        public float maxDistance = 15f;
         public float height = 2f;
-        public float smoothTime = 0.3f;
+        public float rotationSpeed = 100f;
+        public float zoomSpeed = 4f;
+        public float minDistance = 1f;
+        public float maxDistance = 10f;
         
-        [Header("Rotation Settings")]
-        public float rotationSpeed = 2f;
-        public float minVerticalAngle = -30f;
-        public float maxVerticalAngle = 60f;
-        public bool invertY = false;
+        [Header("Touch Controls")]
+        public bool enableTouchControls = true;
+        public float touchSensitivity = 2f;
+        public float pinchSensitivity = 0.5f;
         
-        [Header("Touch Settings")]
-        public float touchSensitivity = 1f;
-        public float pinchSensitivity = 1f;
-        public float doubleTapZoomSpeed = 2f;
+        [Header("Auto Focus")]
+        public bool autoFocusOnAvatar = true;
+        public float focusTransitionTime = 2f;
         
-        [Header("Auto Movement")]
-        public bool enableAutoRotation = true;
-        public float autoRotationSpeed = 5f;
-        public float autoRotationDelay = 5f;
-        
-        private Camera cam;
-        private float currentHorizontalAngle = 0f;
-        private float currentVerticalAngle = 20f;
+        private float currentX = 0f;
+        private float currentY = 20f;
         private float currentDistance;
-        private Vector3 currentVelocity;
+        private bool isTransitioning = false;
         
-        private bool isUserControlling = false;
-        private float lastInputTime;
+        // Touch input tracking
         private Vector2 lastTouchPosition;
-        private float lastTouchDistance;
         private bool isTouching = false;
-        
-        private Vector3 originalPosition;
-        private Quaternion originalRotation;
-        private float originalDistance;
-        
-        public static CameraController Instance { get; private set; }
-        
-        private void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
-        }
+        private bool isPinching = false;
+        private float lastPinchDistance = 0f;
         
         private void Start()
         {
-            cam = GetComponent<Camera>();
-            if (cam == null)
-            {
-                cam = Camera.main;
-            }
-            
-            if (target == null)
-            {
-                // Find avatar target or create default
-                GameObject avatarTarget = GameObject.FindGameObjectWithTag("Avatar");
-                if (avatarTarget != null)
-                {
-                    target = avatarTarget.transform;
-                }
-                else
-                {
-                    // Create default target
-                    GameObject defaultTarget = new GameObject("Camera Target");
-                    defaultTarget.transform.position = new Vector3(0, 1.6f, -1f);
-                    target = defaultTarget.transform;
-                }
-            }
-            
             currentDistance = distance;
             
-            // Store original values for reset
-            originalPosition = transform.position;
-            originalRotation = transform.rotation;
-            originalDistance = distance;
+            // Find avatar if not assigned
+            if (target == null)
+            {
+                var avatarManager = FindObjectOfType<AvatarManager>();
+                if (avatarManager != null)
+                {
+                    StartCoroutine(WaitForAvatarAndFocus(avatarManager));
+                }
+            }
             
-            // Setup initial camera position
             UpdateCameraPosition();
+        }
+        
+        private IEnumerator WaitForAvatarAndFocus(AvatarManager avatarManager)
+        {
+            // Wait for avatar to be created
+            while (target == null)
+            {
+                var avatar = GameObject.Find("RealisticAvatar");
+                if (avatar != null)
+                {
+                    target = avatar.transform;
+                    if (autoFocusOnAvatar)
+                    {
+                        FocusOnAvatar();
+                    }
+                    break;
+                }
+                yield return new WaitForSeconds(0.1f);
+            }
         }
         
         private void Update()
         {
+            if (target == null) return;
+            
             HandleInput();
-            UpdateAutoRotation();
-            UpdateCameraPosition();
+            
+            if (!isTransitioning)
+            {
+                UpdateCameraPosition();
+            }
         }
         
         private void HandleInput()
         {
-            #if UNITY_EDITOR || UNITY_STANDALONE
-            HandleMouseInput();
-            #elif UNITY_IOS || UNITY_ANDROID
-            HandleTouchInput();
-            #endif
-        }
-        
-        private void HandleMouseInput()
-        {
-            // Mouse rotation
+            // Desktop mouse controls
             if (Input.GetMouseButton(0))
             {
-                float mouseX = Input.GetAxis("Mouse X") * rotationSpeed;
-                float mouseY = Input.GetAxis("Mouse Y") * rotationSpeed;
+                float mouseX = Input.GetAxis("Mouse X") * rotationSpeed * Time.deltaTime;
+                float mouseY = Input.GetAxis("Mouse Y") * rotationSpeed * Time.deltaTime;
                 
-                if (invertY) mouseY = -mouseY;
-                
-                currentHorizontalAngle += mouseX;
-                currentVerticalAngle -= mouseY;
-                currentVerticalAngle = Mathf.Clamp(currentVerticalAngle, minVerticalAngle, maxVerticalAngle);
-                
-                isUserControlling = true;
-                lastInputTime = Time.time;
+                currentX += mouseX;
+                currentY -= mouseY;
+                currentY = Mathf.Clamp(currentY, -80f, 80f);
             }
             
-            // Mouse scroll zoom
+            // Mouse wheel zoom
             float scroll = Input.GetAxis("Mouse ScrollWheel");
-            if (Mathf.Abs(scroll) > 0.01f)
+            if (scroll != 0f)
             {
-                currentDistance -= scroll * pinchSensitivity * 2f;
+                currentDistance -= scroll * zoomSpeed;
                 currentDistance = Mathf.Clamp(currentDistance, minDistance, maxDistance);
-                
-                isUserControlling = true;
-                lastInputTime = Time.time;
+            }
+            
+            // Touch controls for mobile
+            if (enableTouchControls)
+            {
+                HandleTouchInput();
             }
         }
         
@@ -152,273 +120,176 @@ namespace MirrorWorld
                 {
                     lastTouchPosition = touch.position;
                     isTouching = true;
+                    isPinching = false;
                 }
-                else if (touch.phase == TouchPhase.Moved && isTouching)
+                else if (touch.phase == TouchPhase.Moved && isTouching && !isPinching)
                 {
                     Vector2 deltaPosition = touch.position - lastTouchPosition;
                     
-                    float deltaX = deltaPosition.x * touchSensitivity * 0.01f;
-                    float deltaY = deltaPosition.y * touchSensitivity * 0.01f;
-                    
-                    if (invertY) deltaY = -deltaY;
-                    
-                    currentHorizontalAngle += deltaX;
-                    currentVerticalAngle -= deltaY;
-                    currentVerticalAngle = Mathf.Clamp(currentVerticalAngle, minVerticalAngle, maxVerticalAngle);
+                    currentX += deltaPosition.x * touchSensitivity * Time.deltaTime;
+                    currentY -= deltaPosition.y * touchSensitivity * Time.deltaTime;
+                    currentY = Mathf.Clamp(currentY, -80f, 80f);
                     
                     lastTouchPosition = touch.position;
-                    isUserControlling = true;
-                    lastInputTime = Time.time;
                 }
-                else if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+                else if (touch.phase == TouchPhase.Ended)
                 {
                     isTouching = false;
-                    
-                    // Check for double tap
-                    if (touch.tapCount == 2)
-                    {
-                        StartCoroutine(DoubleTapZoom());
-                    }
                 }
             }
             else if (Input.touchCount == 2)
             {
+                // Pinch to zoom
                 Touch touch1 = Input.GetTouch(0);
                 Touch touch2 = Input.GetTouch(1);
                 
-                float currentTouchDistance = Vector2.Distance(touch1.position, touch2.position);
+                float currentPinchDistance = Vector2.Distance(touch1.position, touch2.position);
                 
-                if (touch1.phase == TouchPhase.Began || touch2.phase == TouchPhase.Began)
+                if (!isPinching)
                 {
-                    lastTouchDistance = currentTouchDistance;
+                    isPinching = true;
+                    lastPinchDistance = currentPinchDistance;
+                    isTouching = false;
                 }
-                else if (touch1.phase == TouchPhase.Moved || touch2.phase == TouchPhase.Moved)
+                else
                 {
-                    float deltaDistance = (lastTouchDistance - currentTouchDistance) * pinchSensitivity * 0.01f;
-                    currentDistance += deltaDistance;
+                    float deltaPinch = currentPinchDistance - lastPinchDistance;
+                    currentDistance -= deltaPinch * pinchSensitivity * Time.deltaTime;
                     currentDistance = Mathf.Clamp(currentDistance, minDistance, maxDistance);
                     
-                    lastTouchDistance = currentTouchDistance;
-                    isUserControlling = true;
-                    lastInputTime = Time.time;
+                    lastPinchDistance = currentPinchDistance;
                 }
-                
-                isTouching = false; // Disable single touch rotation during pinch
             }
             else
             {
                 isTouching = false;
-            }
-        }
-        
-        private IEnumerator DoubleTapZoom()
-        {
-            float startDistance = currentDistance;
-            float targetDistance = currentDistance > (minDistance + maxDistance) * 0.5f ? minDistance * 1.5f : maxDistance * 0.8f;
-            
-            float elapsedTime = 0f;
-            float duration = 0.5f;
-            
-            while (elapsedTime < duration)
-            {
-                elapsedTime += Time.deltaTime;
-                float progress = elapsedTime / duration;
-                progress = Mathf.SmoothStep(0f, 1f, progress);
-                
-                currentDistance = Mathf.Lerp(startDistance, targetDistance, progress);
-                yield return null;
-            }
-            
-            currentDistance = targetDistance;
-        }
-        
-        private void UpdateAutoRotation()
-        {
-            if (!enableAutoRotation) return;
-            
-            // Start auto rotation if user hasn't interacted recently
-            if (!isUserControlling && Time.time - lastInputTime > autoRotationDelay)
-            {
-                currentHorizontalAngle += autoRotationSpeed * Time.deltaTime;
-            }
-            
-            // Stop user control flag after input
-            if (isUserControlling && Time.time - lastInputTime > 0.5f)
-            {
-                isUserControlling = false;
+                isPinching = false;
             }
         }
         
         private void UpdateCameraPosition()
         {
+            // Calculate desired position
+            Quaternion rotation = Quaternion.Euler(currentY, currentX, 0);
+            Vector3 direction = rotation * Vector3.back;
+            Vector3 desiredPosition = target.position + direction * currentDistance + Vector3.up * height;
+            
+            // Apply position and look at target
+            transform.position = desiredPosition;
+            transform.LookAt(target.position + Vector3.up * height * 0.5f);
+        }
+        
+        public void FocusOnAvatar()
+        {
             if (target == null) return;
             
-            // Calculate desired position
-            Vector3 targetPosition = target.position + Vector3.up * height;
-            
-            // Calculate rotation
-            Quaternion horizontalRotation = Quaternion.AngleAxis(currentHorizontalAngle, Vector3.up);
-            Quaternion verticalRotation = Quaternion.AngleAxis(currentVerticalAngle, Vector3.right);
-            Quaternion finalRotation = horizontalRotation * verticalRotation;
-            
-            // Calculate camera position
-            Vector3 direction = finalRotation * Vector3.back;
-            Vector3 desiredPosition = targetPosition + direction * currentDistance;
-            
-            // Smooth movement
-            transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref currentVelocity, smoothTime);
-            transform.LookAt(targetPosition);
+            StartCoroutine(SmoothFocusTransition());
         }
         
-        /// <summary>
-        /// Called from iOS app via Unity messaging system
-        /// </summary>
-        public void ResetCamera()
+        private IEnumerator SmoothFocusTransition()
         {
-            StartCoroutine(ResetCameraSmooth());
-        }
-        
-        private IEnumerator ResetCameraSmooth()
-        {
-            float duration = 1f;
-            float elapsedTime = 0f;
+            isTransitioning = true;
             
-            float startHorizontalAngle = currentHorizontalAngle;
-            float startVerticalAngle = currentVerticalAngle;
+            // Calculate optimal viewing position
+            Vector3 targetPosition = target.position;
+            float optimalDistance = 3f; // Good distance to view the avatar
+            float optimalHeight = 1.5f;
+            float optimalAngleX = 0f; // Face the avatar directly
+            float optimalAngleY = 10f; // Slightly above
+            
             float startDistance = currentDistance;
+            float startHeight = height;
+            float startX = currentX;
+            float startY = currentY;
             
-            float targetHorizontalAngle = 0f;
-            float targetVerticalAngle = 20f;
-            float targetDistance = originalDistance;
-            
-            while (elapsedTime < duration)
+            float elapsed = 0f;
+            while (elapsed < focusTransitionTime)
             {
-                elapsedTime += Time.deltaTime;
-                float progress = elapsedTime / duration;
-                progress = Mathf.SmoothStep(0f, 1f, progress);
+                float t = elapsed / focusTransitionTime;
+                t = Mathf.SmoothStep(0f, 1f, t); // Smooth easing
                 
-                currentHorizontalAngle = Mathf.Lerp(startHorizontalAngle, targetHorizontalAngle, progress);
-                currentVerticalAngle = Mathf.Lerp(startVerticalAngle, targetVerticalAngle, progress);
-                currentDistance = Mathf.Lerp(startDistance, targetDistance, progress);
+                currentDistance = Mathf.Lerp(startDistance, optimalDistance, t);
+                height = Mathf.Lerp(startHeight, optimalHeight, t);
+                currentX = Mathf.LerpAngle(startX, optimalAngleX, t);
+                currentY = Mathf.Lerp(startY, optimalAngleY, t);
                 
+                UpdateCameraPosition();
+                
+                elapsed += Time.deltaTime;
                 yield return null;
             }
             
-            currentHorizontalAngle = targetHorizontalAngle;
-            currentVerticalAngle = targetVerticalAngle;
-            currentDistance = targetDistance;
+            // Ensure final values
+            currentDistance = optimalDistance;
+            height = optimalHeight;
+            currentX = optimalAngleX;
+            currentY = optimalAngleY;
+            
+            UpdateCameraPosition();
+            isTransitioning = false;
         }
         
         public void SetTarget(Transform newTarget)
         {
             target = newTarget;
-        }
-        
-        public void FocusOnAvatar()
-        {
-            if (AvatarManager.Instance?.currentAvatar != null)
+            if (autoFocusOnAvatar)
             {
-                SetTarget(AvatarManager.Instance.currentAvatar.transform);
+                FocusOnAvatar();
             }
         }
         
-        public void SetCameraDistance(float newDistance)
+        public void ResetCamera()
         {
-            currentDistance = Mathf.Clamp(newDistance, minDistance, maxDistance);
-        }
-        
-        public void EnableAutoRotation(bool enable)
-        {
-            enableAutoRotation = enable;
-        }
-        
-        public void SetAutoRotationSpeed(float speed)
-        {
-            autoRotationSpeed = speed;
-        }
-        
-        // Cinematic camera movements
-        public void StartCinematicIntro()
-        {
-            StartCoroutine(CinematicIntroSequence());
-        }
-        
-        private IEnumerator CinematicIntroSequence()
-        {
-            // Start far and high
-            currentDistance = maxDistance;
-            currentVerticalAngle = 45f;
-            currentHorizontalAngle = -45f;
+            currentX = 0f;
+            currentY = 20f;
+            currentDistance = distance;
+            height = 2f;
             
-            // Smoothly move to normal position
-            yield return StartCoroutine(SmoothTransition(
-                currentHorizontalAngle, 0f,
-                currentVerticalAngle, 20f,
-                currentDistance, originalDistance,
-                3f
-            ));
-        }
-        
-        private IEnumerator SmoothTransition(float startH, float endH, float startV, float endV, float startD, float endD, float duration)
-        {
-            float elapsedTime = 0f;
-            
-            while (elapsedTime < duration)
+            if (target != null)
             {
-                elapsedTime += Time.deltaTime;
-                float progress = elapsedTime / duration;
-                progress = Mathf.SmoothStep(0f, 1f, progress);
-                
-                currentHorizontalAngle = Mathf.Lerp(startH, endH, progress);
-                currentVerticalAngle = Mathf.Lerp(startV, endV, progress);
-                currentDistance = Mathf.Lerp(startD, endD, progress);
-                
-                yield return null;
+                UpdateCameraPosition();
             }
-            
-            currentHorizontalAngle = endH;
-            currentVerticalAngle = endV;
-            currentDistance = endD;
         }
         
-        // Camera shake for dramatic effect
-        public void ShakeCamera(float intensity = 0.1f, float duration = 0.5f)
+        // Called from UI buttons
+        public void ZoomIn()
         {
-            StartCoroutine(CameraShake(intensity, duration));
+            currentDistance = Mathf.Clamp(currentDistance - 1f, minDistance, maxDistance);
         }
         
-        private IEnumerator CameraShake(float intensity, float duration)
+        public void ZoomOut()
         {
-            Vector3 originalPos = transform.position;
-            float elapsedTime = 0f;
-            
-            while (elapsedTime < duration)
-            {
-                elapsedTime += Time.deltaTime;
-                
-                Vector3 shakeOffset = Random.insideUnitSphere * intensity;
-                transform.position = originalPos + shakeOffset;
-                
-                yield return null;
-            }
-            
-            transform.position = originalPos;
+            currentDistance = Mathf.Clamp(currentDistance + 1f, minDistance, maxDistance);
+        }
+        
+        public void RotateLeft()
+        {
+            currentX -= 45f;
+        }
+        
+        public void RotateRight()
+        {
+            currentX += 45f;
         }
         
         private void OnDrawGizmosSelected()
         {
-            if (target == null) return;
-            
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(target.position, 0.5f);
-            
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(transform.position, target.position);
-            
-            Gizmos.color = Color.blue;
-            Vector3 targetPos = target.position + Vector3.up * height;
-            Gizmos.DrawWireSphere(targetPos, minDistance);
-            Gizmos.DrawWireSphere(targetPos, maxDistance);
+            if (target != null)
+            {
+                // Draw camera target
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawWireSphere(target.position, 0.2f);
+                
+                // Draw distance limits
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireSphere(target.position, minDistance);
+                Gizmos.color = Color.green;
+                Gizmos.DrawWireSphere(target.position, maxDistance);
+                
+                // Draw current camera position
+                Gizmos.color = Color.blue;
+                Gizmos.DrawLine(target.position, transform.position);
+            }
         }
     }
 }

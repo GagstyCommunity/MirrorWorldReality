@@ -4,7 +4,7 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 24
-  productGUID: b8b7c7d4e5f6a7b8c9d0e1f2a3b4c5d6
+  productGUID: a1b2c3d4e5f6789012345678901234567
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
@@ -25,8 +25,8 @@ PlayerSettings:
   m_SplashScreenDrawMode: 0
   m_SplashScreenBackgroundAnimationZoom: 1
   m_SplashScreenLogoAnimationZoom: 1
-  m_SplashScreenBackgroundLandscapeAspect: 1
-  m_SplashScreenBackgroundPortraitAspect: 1
+  m_SplashScreenBackgroundLandscapeAspectRatio: 2
+  m_SplashScreenBackgroundPortraitAspectRatio: 1
   m_SplashScreenBackgroundLandscapeUvs:
     serializedVersion: 2
     x: 0
@@ -41,151 +41,53 @@ PlayerSettings:
     height: 1
   m_SplashScreenLogos: []
   m_VirtualRealitySDKs: []
-  m_targetPixelDensity: 30
-  m_iosShowActivityIndicatorOnLoading: -1
-  m_androidShowActivityIndicatorOnLoading: -1
-  m_iosUseCustomAppBackgroundBehavior: 0
-  m_iosAllowHTTPDownload: 1
-  m_allowedAutorotateToPortrait: 1
-  m_allowedAutorotateToPortraitUpsideDown: 1
-  m_allowedAutorotateToLandscapeRight: 1
-  m_allowedAutorotateToLandscapeLeft: 1
-  m_useOSAutorotation: 1
-  m_use32BitDisplayBuffer: 1
-  m_preserveFramebufferAlpha: 0
-  m_disableDepthAndStencilBuffers: 0
-  m_androidStartInFullscreen: 1
-  m_androidRenderOutsideSafeArea: 1
-  m_androidUseSwappy: 1
-  m_androidBlitType: 0
-  m_androidResizableWindow: 0
-  m_androidDefaultWindowWidth: 1920
-  m_androidDefaultWindowHeight: 1080
-  m_androidMinimumWindowWidth: 400
-  m_androidMinimumWindowHeight: 300
-  m_androidFullscreenMode: 1
-  m_defaultIsNativeResolution: 1
-  m_macRetinaSupport: 1
-  m_runInBackground: 1
-  m_captureSingleScreen: 0
-  m_muteOtherAudioSources: 0
-  m_Prepare: 0
-  m_Enable: 0
-  m_Override: 0
-  m_Logging: 0
-  m_MobileMTRendering: 1
-  m_iosAppInBackgroundBehavior: 0
-  m_displayResolutionDialog: 1
-  m_iosAllowHTTPDownload: 1
-  m_AndroidTargetArchitectures: 1
-  m_AndroidSplashScreenScale: 0
-  m_androidSplashScreen: {fileID: 0}
-  m_AndroidKeystoreName: 
-  m_AndroidKeyaliasName: 
-  m_AndroidBuildApkPerCpuArchitecture: 0
-  m_AndroidTVCompatibility: 0
-  m_AndroidIsGame: 1
-  m_AndroidEnableTango: 0
-  m_androidEnableBanner: 1
-  m_androidUseLowAccuracyLocation: 0
-  m_androidUseCustomKeystore: 0
-  m_AndroidBundleVersionCode: 1
-  m_AndroidMinSdkVersion: 22
-  m_AndroidTargetSdkVersion: 0
-  m_AndroidPreferredInstallLocation: 1
-  m_aotOptions: 
-  m_stripEngineCode: 1
-  m_iPhoneStrippingLevel: 0
-  m_iPhoneScriptCallOptimization: 0
-  m_ForceInternetPermission: 0
-  m_ForceSDCardPermission: 0
-  m_CreateWallpaper: 0
-  m_APKExpansionFiles: 0
-  m_keepLoadedShadersAlive: 0
-  m_StripUnusedMeshComponents: 1
-  m_VertexChannelCompressionMask: 4054
-  m_iPhoneSdkVersion: 988
-  m_iOSTargetOSVersionString: 13.0
-  m_tvOSSdkVersion: 0
-  m_tvOSRequireExtendedGameController: 0
-  m_tvOSTargetOSVersionString: 10.0
-  m_uIPrerenderedIcon: 0
-  m_uIRequiresPersistentWiFi: 0
-  m_uIRequiresFullScreen: 1
-  m_uIStatusBarHidden: 1
-  m_uIExitOnSuspend: 0
-  m_uIStatusBarStyle: 0
-  m_iPhoneSplashScreen: {fileID: 0}
-  m_iPhoneHighResSplashScreen: {fileID: 0}
-  m_iPhoneTallHighResSplashScreen: {fileID: 0}
-  m_iPhone47inSplashScreen: {fileID: 0}
-  m_iPhone55inPortraitSplashScreen: {fileID: 0}
-  m_iPhone55inLandscapeSplashScreen: {fileID: 0}
-  m_iPhone58inPortraitSplashScreen: {fileID: 0}
-  m_iPhone58inLandscapeSplashScreen: {fileID: 0}
-  m_iPadPortraitSplashScreen: {fileID: 0}
-  m_iPadHighResPortraitSplashScreen: {fileID: 0}
-  m_iPadLandscapeSplashScreen: {fileID: 0}
-  m_iPadHighResLandscapeSplashScreen: {fileID: 0}
-  m_iPhone65inPortraitSplashScreen: {fileID: 0}
-  m_iPhone65inLandscapeSplashScreen: {fileID: 0}
-  m_iPhone61inPortraitSplashScreen: {fileID: 0}
-  m_iPhone61inLandscapeSplashScreen: {fileID: 0}
-  m_appleTVSplashScreen: {fileID: 0}
-  m_appleTVSplashScreen2x: {fileID: 0}
-  m_tvOSSmallIconLayers: []
-  m_tvOSSmallIconLayers2x: []
-  m_tvOSLargeIconLayers: []
-  m_tvOSLargeIconLayers2x: []
-  m_tvOSTopShelfImageLayers: []
-  m_tvOSTopShelfImageLayers2x: []
-  m_tvOSTopShelfImageWideLayers: []
-  m_tvOSTopShelfImageWideLayers2x: []
-  m_iOSLaunchScreenType: 0
-  m_iOSLaunchScreenPortrait: {fileID: 0}
-  m_iOSLaunchScreenLandscape: {fileID: 0}
-  m_iOSLaunchScreenBackgroundColor:
+  m_TargetPixelDensity: 30
+  m_IOSHighResolutionPortraitSplashScreen: {fileID: 0}
+  m_IOSHighResolutionLandscapeSplashScreen: {fileID: 0}
+  m_IOSLaunchScreenType: 0
+  m_IOSLaunchScreenPortrait: {fileID: 0}
+  m_IOSLaunchScreenLandscape: {fileID: 0}
+  m_IOSLaunchScreenBackgroundColor:
     serializedVersion: 2
     rgba: 0
-  m_iOSLaunchScreenFillPct: 100
-  m_iOSLaunchScreenSize: 100
-  m_iOSLaunchScreenCustomXibPath: 
-  m_iOSLaunchScreeniPadType: 0
-  m_iOSLaunchScreeniPadImage: {fileID: 0}
-  m_iOSLaunchScreeniPadBackgroundColor:
+  m_IOSLaunchScreenFillPct: 100
+  m_IOSLaunchScreenSize: 100
+  m_IOSLaunchScreenCustomXibPath: 
+  m_IOSLaunchScreeniPadType: 0
+  m_IOSLaunchScreeniPadImage: {fileID: 0}
+  m_IOSLaunchScreeniPadBackgroundColor:
     serializedVersion: 2
     rgba: 0
-  m_iOSLaunchScreeniPadFillPct: 100
-  m_iOSLaunchScreeniPadSize: 100
-  m_iOSLaunchScreeniPadCustomXibPath: 
-  m_iOSUseLaunchScreenStoryboard: 0
-  m_iOSLaunchScreenCustomStoryboardPath: 
-  m_iOSDeviceRequirements: []
-  m_iOSURLSchemes: []
-  m_macOSURLSchemes: []
-  m_iOSBackgroundModes: 0
-  m_iOSMetalForceHardShadows: 0
-  m_appleDeveloperTeamID: 
-  m_iOSManualSigningProvisioningProfileID: 
-  m_tvOSManualSigningProvisioningProfileID: 
-  m_iOSManualSigningProvisioningProfileType: 0
-  m_tvOSManualSigningProvisioningProfileType: 0
-  m_appleEnableAutomaticSigning: 0
-  m_iOSRequireARKit: 0
-  m_iOSAutomaticallyDetectAndAddCapabilities: 1
-  m_appleEnableProMotion: 0
-  m_shaderPrecisionModel: 0
-  m_vulkanNumSwapchainBuffers: 3
-  m_vulkanEnableSetSRGBWrite: 0
-  m_vulkanEnablePreTransform: 0
-  m_vulkanEnableLateAcquireNextImage: 0
-  m_vulkanEnableCommandBufferRecycling: 1
-  m_supportedAspectRatios:
-    4:3: 1
-    5:4: 1
-    16:10: 1
-    16:9: 1
-    Others: 1
+  m_IOSLaunchScreeniPadFillPct: 100
+  m_IOSLaunchScreeniPadSize: 100
+  m_IOSLaunchScreeniPadCustomXibPath: 
+  m_IOSUseLaunchScreenStoryboard: 0
+  m_IOSLaunchScreenCustomStoryboardPath: 
+  m_IOSDeviceRequirements: []
+  m_IOSURLSchemes: []
+  iOSPlayerExportPath: ../iOS
+  m_BuildTargetPlatformSettings:
+  - m_BuildTarget: iPhone
+    m_PlayerSettings:
+      firstStreamedSceneWithValidName: 0
+      secondaryTextures: []
+      streamingMipmapsActive: 0
+      streamingMipmapsAddAllCameras: 1
+      streamingMipmapsMemoryBudget: 512
+      streamingMipmapsRenderersPerFrame: 512
+      streamingMipmapsMaxLevelReduction: 2
+      streamingMipmapsMaxFileIORequests: 1024
+      hasARKit: 0
+      scriptingBackend: 1
+      il2cppCompilerConfiguration: 0
+      managedStrippingLevel: 0
+      incrementalIl2cppBuild: 0
+      allowUnsafeCode: 0
+      additionalIl2CppArgs: 
+      scriptingRuntimeVersion: 1
+      gcIncremental: 1
+      gcWBarrierValidation: 0
+      apiCompatibilityLevelPerPlatform: {}
   bundleVersion: 1.0
   preloadedAssets: []
   metroInputSource: 0
@@ -220,7 +122,8 @@ PlayerSettings:
       protectedContext: 0
       v2Signing: 1
       enableDynamicResolution: 0
-  protectGraphicsMemory: 0
+    enable360StereoCapture: 0
+  isWsaHolographicRemotingEnabled: 0
   enableFrameTimingStats: 0
   useHDRDisplay: 0
   D3DHDRBitDepth: 0
@@ -230,14 +133,9 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Standalone: com.mirrorworld.park
     iPhone: com.mirrorworld.park
-    Android: com.mirrorworld.park
   buildNumber:
-    Standalone: 0
-    iPhone: 0
-    Android: 0
-  overrideDefaultApplicationIdentifier: 0
+    iPhone: 1
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 22
   AndroidTargetSdkVersion: 0
@@ -254,32 +152,16 @@ PlayerSettings:
   StripUnusedMeshComponents: 1
   VertexChannelCompressionMask: 4054
   iPhoneSdkVersion: 988
-  iOSTargetOSVersionString: 13.0
+  iOSTargetOSVersionString: 12.0
   tvOSSdkVersion: 0
   tvOSRequireExtendedGameController: 0
-  tvOSTargetOSVersionString: 10.0
+  tvOSTargetOSVersionString: 12.0
   uIPrerenderedIcon: 0
   uIRequiresPersistentWiFi: 0
   uIRequiresFullScreen: 1
   uIStatusBarHidden: 1
   uIExitOnSuspend: 0
   uIStatusBarStyle: 0
-  iPhoneSplashScreen: {fileID: 0}
-  iPhoneHighResSplashScreen: {fileID: 0}
-  iPhoneTallHighResSplashScreen: {fileID: 0}
-  iPhone47inSplashScreen: {fileID: 0}
-  iPhone55inPortraitSplashScreen: {fileID: 0}
-  iPhone55inLandscapeSplashScreen: {fileID: 0}
-  iPhone58inPortraitSplashScreen: {fileID: 0}
-  iPhone58inLandscapeSplashScreen: {fileID: 0}
-  iPadPortraitSplashScreen: {fileID: 0}
-  iPadHighResPortraitSplashScreen: {fileID: 0}
-  iPadLandscapeSplashScreen: {fileID: 0}
-  iPadHighResLandscapeSplashScreen: {fileID: 0}
-  iPhone65inPortraitSplashScreen: {fileID: 0}
-  iPhone65inLandscapeSplashScreen: {fileID: 0}
-  iPhone61inPortraitSplashScreen: {fileID: 0}
-  iPhone61inLandscapeSplashScreen: {fileID: 0}
   appleTVSplashScreen: {fileID: 0}
   appleTVSplashScreen2x: {fileID: 0}
   tvOSSmallIconLayers: []
@@ -311,9 +193,12 @@ PlayerSettings:
   iOSLaunchScreenCustomStoryboardPath: 
   iOSDeviceRequirements: []
   iOSURLSchemes: []
-  macOSURLSchemes: []
   iOSBackgroundModes: 0
   iOSMetalForceHardShadows: 0
+  metalEditorSupport: 1
+  metalAPIValidation: 1
+  iOSRenderExtraFrameOnPause: 0
+  iosCopyPluginsCodeInsteadOfSymlink: 0
   appleDeveloperTeamID: 
   iOSManualSigningProvisioningProfileID: 
   tvOSManualSigningProvisioningProfileID: 
@@ -323,54 +208,197 @@ PlayerSettings:
   iOSRequireARKit: 0
   iOSAutomaticallyDetectAndAddCapabilities: 1
   appleEnableProMotion: 0
-  shaderPrecisionModel: 0
-  vulkanNumSwapchainBuffers: 3
-  vulkanEnableSetSRGBWrite: 0
-  vulkanEnablePreTransform: 0
-  vulkanEnableLateAcquireNextImage: 0
-  vulkanEnableCommandBufferRecycling: 1
-  supportedAspectRatios:
-    4:3: 1
-    5:4: 1
-    16:10: 1
-    16:9: 1
-    Others: 1
-  bundleVersion: 1.0
-  preloadedAssets: []
-  metroInputSource: 0
-  wsaTransparentSwapchain: 0
-  m_HolographicPauseOnTrackingLoss: 1
-  xboxOneDisableKinectGpuReservation: 1
-  xboxOneEnable7thCore: 1
-  scriptingDefineSymbols: {}
-  additionalIl2CppArgs: 
-  scriptingRuntimeVersion: 1
-  gcIncremental: 1
-  assemblyVersionValidation: 1
-  gcWBarrierValidation: 0
-  apiCompatibilityLevelPerPlatform: {}
-  m_RenderingPath: 1
-  m_MobileRenderingPath: 1
-  metroPackageName: MirrorWorldPark
-  metroPackageVersion: 
-  metroCertificatePath: 
-  metroCertificatePassword: 
-  metroCertificateSubject: 
-  metroCertificateIssuer: 
-  metroCertificateNotAfter: 0000000000000000
-  metroApplicationDescription: MirrorWorldPark
-  wsaImages: {}
-  m_TizenProductDescription: 
-  m_TizenProductURL: 
-  m_TizenSigningProfileName: 
-  m_TizenGPSPermissions: 0
-  m_TizenMicrophonePermissions: 0
-  m_TizenMinOSVersion: 1
-  m_buildAppBundle: 0
-  m_assetBundleManifestVersionCode: 1
-  m_splashScreenBackgroundSourceLandscape: {fileID: 0}
-  m_splashScreenBackgroundSourcePortrait: {fileID: 0}
-  m_spritePackerPolicy: 
+  clonedFromGUID: c0afd0d1d80e3634a9dac47e8a0426ea
+  templatePackageId: com.unity.template.3d@5.0.4
+  templateDefaultScene: Assets/Scenes/SampleScene.unity
+  AndroidTargetArchitectures: 1
+  AndroidSplashScreenScale: 0
+  androidSplashScreen: {fileID: 0}
+  AndroidKeystoreName: 
+  AndroidKeyaliasName: 
+  AndroidBuildApkPerCpuArchitecture: 0
+  AndroidTVCompatibility: 0
+  AndroidIsGame: 1
+  AndroidEnableTango: 0
+  androidEnableBanner: 1
+  androidUseLowAccuracyLocation: 0
+  androidUseCustomKeystore: 0
+  m_AndroidBanners:
+  - width: 320
+    height: 180
+    banner: {fileID: 0}
+  androidGamepadSupportLevel: 0
+  AndroidValidateAppBundleSize: 1
+  AndroidAppBundleSizeToValidate: 150
+  m_BuildTargetIcons: []
+  m_BuildTargetPlatformIcons: []
+  m_BuildTargetBatching:
+  - m_BuildTarget: Standalone
+    m_StaticBatching: 1
+    m_DynamicBatching: 0
+  - m_BuildTarget: tvOS
+    m_StaticBatching: 1
+    m_DynamicBatching: 0
+  - m_BuildTarget: iPhone
+    m_StaticBatching: 1
+    m_DynamicBatching: 0
+  - m_BuildTarget: Android
+    m_StaticBatching: 1
+    m_DynamicBatching: 0
+  - m_BuildTarget: WebGL
+    m_StaticBatching: 0
+    m_DynamicBatching: 0
+  m_BuildTargetGraphicsJobs:
+  - m_BuildTarget: MacStandaloneSupport
+    m_GraphicsJobs: 0
+  - m_BuildTarget: Switch
+    m_GraphicsJobs: 1
+  - m_BuildTarget: MetroSupport
+    m_GraphicsJobs: 0
+  - m_BuildTarget: AppleTVSupport
+    m_GraphicsJobs: 0
+  - m_BuildTarget: BJMSupport
+    m_GraphicsJobs: 1
+  - m_BuildTarget: LinuxStandaloneSupport
+    m_GraphicsJobs: 1
+  - m_BuildTarget: PS4Player
+    m_GraphicsJobs: 1
+  - m_BuildTarget: iOSSupport
+    m_GraphicsJobs: 0
+  - m_BuildTarget: WindowsStandaloneSupport
+    m_GraphicsJobs: 1
+  - m_BuildTarget: XboxOnePlayer
+    m_GraphicsJobs: 1
+  - m_BuildTarget: LuminSupport
+    m_GraphicsJobs: 0
+  - m_BuildTarget: AndroidPlayer
+    m_GraphicsJobs: 0
+  - m_BuildTarget: WebGLSupport
+    m_GraphicsJobs: 0
+  m_BuildTargetGraphicsJobMode:
+  - m_BuildTarget: PS4Player
+    m_GraphicsJobMode: 0
+  - m_BuildTarget: XboxOnePlayer
+    m_GraphicsJobMode: 0
+  m_BuildTargetGraphicsAPIs:
+  - m_BuildTarget: AndroidPlayer
+    m_APIs: 150000000b000000
+    m_Automatic: 0
+  - m_BuildTarget: iOSSupport
+    m_APIs: 10000000
+    m_Automatic: 1
+  - m_BuildTarget: AppleTVSupport
+    m_APIs: 10000000
+    m_Automatic: 0
+  - m_BuildTarget: WebGLSupport
+    m_APIs: 0b000000
+    m_Automatic: 1
+  m_BuildTargetVRSettings:
+  - m_BuildTarget: Standalone
+    m_Enabled: 0
+    m_Devices:
+    - Oculus
+    - OpenVR
+  openGLRequireES31: 0
+  openGLRequireES31AEP: 0
+  openGLRequireES32: 0
+  m_TemplateCustomTags: {}
+  mobileMTRendering:
+    iPhone: 1
+    tvOS: 1
+  m_BuildTargetGroupLightmapEncodingQuality: []
+  m_BuildTargetGroupLightmapSettings: []
+  playModeTestRunnerEnabled: 0
+  runPlayModeTestAsEditModeTest: 0
+  actionOnDotNetUnhandledException: 1
+  enableInternalProfiler: 0
+  logObjCUncaughtExceptions: 1
+  enableCrashReportAPI: 0
+  cameraUsageDescription: Camera access is required for taking photos to create 3D avatars
+  locationUsageDescription: 
+  microphoneUsageDescription: 
+  switchScreenResolutionBehavior: 2
+  switchNetworkInterfaceSelection: 0
+  switchPlayerConnectionEnabled: 1
+  switchUseNewStyleFilepaths: 0
+  switchUseMicroSleepForYield: 1
+  switchEnableNewStylePlatformSettings: 1
+  ps4NPAgeRating: 12
+  ps4NPTitleSecret: 
+  ps4NPTrophyPackPath: 
+  ps4ParentalLevel: 11
+  ps4ContentID: ED1633-NPXX51362_00-0000000000000000
+  ps4Category: 0
+  ps4MasterVersion: 01.00
+  ps4AppVersion: 01.00
+  ps4AppType: 0
+  ps4ParamSfxPath: 
+  ps4VideoOutPixelFormat: 0
+  ps4VideoOutInitialWidth: 1920
+  ps4VideoOutBaseModeInitialWidth: 1920
+  ps4VideoOutReprojectionRate: 60
+  ps4PronunciationXMLPath: 
+  ps4PronunciationSIGPath: 
+  ps4BackgroundImagePath: 
+  ps4StartupImagePath: 
+  ps4StartupImagesFolder: 
+  ps4IconImagesFolder: 
+  ps4SaveDataImagePath: 
+  ps4SdkOverride: 
+  ps4BGMPath: 
+  ps4ShareFilePath: 
+  ps4ShareOverlayImagePath: 
+  ps4PrivacyGuardImagePath: 
+  ps4ExtraSceSysFile: 
+  ps4NPtitleDatPath: 
+  ps4RemotePlayKeyAssignment: -1
+  ps4RemotePlayKeyMappingDir: 
+  ps4PlayTogetherPlayerCount: 0
+  ps4EnterButtonAssignment: 1
+  ps4ApplicationParam1: 0
+  ps4ApplicationParam2: 0
+  ps4ApplicationParam3: 0
+  ps4ApplicationParam4: 0
+  ps4DownloadDataSize: 0
+  ps4GarlicHeapSize: 2048
+  ps4ProGarlicHeapSize: 2560
+  playerPrefsMaxSize: 32768
+  ps4Passcode: frAQBc8Wsa1xVPfvJcrgRYwTiizs2trQ
+  ps4pnSessions: 1
+  ps4pnPresence: 1
+  ps4pnFriends: 1
+  ps4pnGameCustomData: 1
+  playerPrefsSupport: 0
+  enableApplicationExit: 0
+  resetTempFolder: 1
+  restrictedAudioUsageRights: 0
+  ps4UseResolutionFallback: 0
+  ps4ReprojectionSupport: 0
+  ps4UseAudio3dBackend: 0
+  ps4SocialScreenEnabled: 0
+  ps4ScriptOptimizationLevel: 0
+  ps4Audio3dVirtualSpeakerCount: 14
+  ps4attribCpuUsage: 1
+  ps4PatchPkgPath: 
+  ps4PatchLatestPkgPath: 
+  ps4PatchChangeinfoPath: 
+  ps4PatchDayOne: 0
+  ps4attribUserManagement: 0
+  ps4attribMoveSupport: 0
+  ps4attrib3DSupport: 0
+  ps4attribShareSupport: 0
+  ps4attribExclusiveVR: 0
+  ps4disableAutoHideSplash: 0
+  ps4videoRecordingFeaturesUsed: 0
+  ps4contentSearchFeaturesUsed: 0
+  ps4attribEyeToEyeDistanceSettingVR: 0
+  ps4IncludedModules: []
+  ps4attribVROutputEnabled: 0
+  monoEnv: 
+  splashScreenBackgroundSourceLandscape: {fileID: 0}
+  splashScreenBackgroundSourcePortrait: {fileID: 0}
+  blurSplashScreenBackground: 1
+  spritePackerPolicy: 
   webGLMemorySize: 16
   webGLExceptionSupport: 1
   webGLNameFilesAsHashes: 0
@@ -382,44 +410,99 @@ PlayerSettings:
   webGLAnalyzeBuildSize: 0
   webGLUseEmbeddedResources: 0
   webGLCompressionFormat: 1
-  webGLWasmArithmeticExceptions: 0
   webGLLinkerTarget: 1
   webGLThreadsSupport: 0
-  webGLDecompressionFallback: 0
+  webGLWasmStreaming: 0
   scriptingDefineSymbols: {}
-  additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}
   il2cppCompilerConfiguration: {}
   managedStrippingLevel: {}
   incrementalIl2cppBuild: {}
-  suppressCommonWarnings: 1
   allowUnsafeCode: 0
-  useDeterministicCompilation: 1
-  useReferenceAssemblies: 1
-  enableRoslynAnalyzers: 1
   additionalIl2CppArgs: 
   scriptingRuntimeVersion: 1
   gcIncremental: 1
-  assemblyVersionValidation: 1
   gcWBarrierValidation: 0
   apiCompatibilityLevelPerPlatform: {}
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: MirrorWorldPark
+  metroPackageName: Template_3D
   metroPackageVersion: 
   metroCertificatePath: 
   metroCertificatePassword: 
   metroCertificateSubject: 
   metroCertificateIssuer: 
   metroCertificateNotAfter: 0000000000000000
-  metroApplicationDescription: MirrorWorldPark
+  metroApplicationDescription: Template_3D
   wsaImages: {}
-  m_TizenProductDescription: 
-  m_TizenProductURL: 
-  m_TizenSigningProfileName: 
-  m_TizenGPSPermissions: 0
-  m_TizenMicrophonePermissions: 0
-  m_TizenMinOSVersion: 1
-  m_buildAppBundle: 0
-  m_assetBundleManifestVersionCode: 1
+  metroTileShortName: 
+  metroTileShowName: 0
+  metroMediumTileShowName: 0
+  metroLargeTileShowName: 0
+  metroWideTileShowName: 0
+  metroSupportStreamingInstall: 0
+  metroLastRequiredScene: 0
+  metroDefaultTileSize: 1
+  metroTileForegroundText: 2
+  metroTileBackgroundColor: {r: 0.13333334, g: 0.17254902, b: 0.21568628, a: 0}
+  metroSplashScreenBackgroundColor: {r: 0.12941177, g: 0.17254902, b: 0.21568628, a: 1}
+  metroSplashScreenUseBackgroundColor: 0
+  platformCapabilities: {}
+  metroTargetDeviceFamily: {}
+  metroFTAName: 
+  metroFTAFileTypes: []
+  metroProtocolName: 
+  XboxOneProductId: 
+  XboxOneUpdateKey: 
+  XboxOneSandboxId: 
+  XboxOneContentId: 
+  XboxOneTitleId: 
+  XboxOneSCId: 
+  XboxOneGameOsOverridePath: 
+  XboxOnePackagingOverridePath: 
+  XboxOneAppManifestOverridePath: 
+  XboxOneVersion: 1.0.0.0
+  XboxOnePackageEncryption: 0
+  XboxOnePackageUpdateGranularity: 2
+  XboxOneDescription: 
+  XboxOneLanguage:
+  - enus
+  XboxOneCapability: []
+  XboxOneGameRating: {}
+  XboxOneIsContentPackage: 0
+  XboxOneEnableGPUVariability: 1
+  XboxOneSockets: {}
+  XboxOneSplashScreen: {fileID: 0}
+  XboxOneAllowedProductIds: []
+  XboxOnePersistentLocalStorageSize: 0
+  XboxOneXTitleMemory: 8
+  XboxOneOverrideIdentityName: 
+  XboxOneOverrideIdentityPublisher: 
+  vrEditorSettings:
+    daydream:
+      daydreamIconForeground: {fileID: 0}
+      daydreamIconBackground: {fileID: 0}
+  cloudServicesEnabled:
+    UNet: 1
+  luminIcon:
+    m_Name: 
+    m_ModelFolderPath: 
+    m_PortalFolderPath: 
+  luminCert:
+    m_CertPath: 
+    m_SignPackage: 1
+  luminIsChannelApp: 0
+  luminVersion:
+    m_VersionCode: 1
+    m_VersionName: 
+  apiCompatibilityLevel: 6
+  cloudProjectId: 
+  framebufferDepthMemorylessMode: 0
+  projectName: 
+  organizationId: 
+  cloudEnabled: 0
+  enableNativePlatformBackendsForNewInputSystem: 0
+  disableOldInputManagerSupport: 0
+  legacyClampBlendShapeWeights: 0
+  virtualTexturingSupportEnabled: 0

@@ -8,476 +8,331 @@ namespace MirrorWorld
 {
     public class AvatarManager : MonoBehaviour
     {
-        [Header("Avatar Settings")]
+        [Header("Avatar Configuration")]
         public Material defaultAvatarMaterial;
         public Transform avatarSpawnPoint;
-        public float loadingTimeout = 30f;
         
-        [Header("Animation Settings")]
-        public float breathingIntensity = 0.05f;
-        public float breathingSpeed = 2f;
-        public float blinkInterval = 3f;
-        public float headMovementRange = 15f;
-        
+        [Header("Runtime References")]
         private GameObject currentAvatar;
-        private AvatarAnimationController animationController;
-        private AvatarData currentAvatarData;
-        private bool isLoading = false;
+        private MeshRenderer avatarRenderer;
+        private MeshFilter avatarMeshFilter;
+        private Animator avatarAnimator;
         
-        public static AvatarManager Instance { get; private set; }
-        
-        public event Action<GameObject> OnAvatarLoaded;
-        public event Action<string> OnAvatarLoadFailed;
-        
-        private void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
-        }
+        [Header("Debug")]
+        public bool enableDebugLogs = true;
         
         private void Start()
         {
-            InitializeAvatarSystem();
-        }
-        
-        private void InitializeAvatarSystem()
-        {
             if (avatarSpawnPoint == null)
-            {
-                GameObject spawnPoint = new GameObject("AvatarSpawnPoint");
-                spawnPoint.transform.position = new Vector3(0, 0, -1);
-                avatarSpawnPoint = spawnPoint.transform;
-            }
-            
-            Debug.Log("MirrorWorld Avatar Manager initialized");
+                avatarSpawnPoint = transform;
+                
+            LogDebug("AvatarManager initialized");
         }
         
         /// <summary>
-        /// Called from iOS app via Unity messaging system
+        /// Called from iOS Swift app to load avatar data
         /// </summary>
-        /// <param name="avatarJson">JSON string containing avatar data</param>
-        public void LoadAvatar(string avatarJson)
+        /// <param name="jsonData">JSON string containing avatar data</param>
+        public void LoadAvatarData(string jsonData)
         {
-            if (isLoading)
-            {
-                Debug.LogWarning("Avatar is already loading, please wait...");
-                return;
-            }
-            
-            StartCoroutine(LoadAvatarCoroutine(avatarJson));
-        }
-        
-        private IEnumerator LoadAvatarCoroutine(string avatarJson)
-        {
-            isLoading = true;
+            LogDebug($"Received avatar data: {jsonData.Substring(0, Mathf.Min(100, jsonData.Length))}...");
             
             try
             {
-                Debug.Log("Parsing avatar data...");
-                currentAvatarData = JsonConvert.DeserializeObject<AvatarData>(avatarJson);
-                
-                if (currentAvatarData == null)
-                {
-                    throw new Exception("Failed to parse avatar data");
-                }
-                
-                // Clear existing avatar
-                if (currentAvatar != null)
-                {
-                    DestroyImmediate(currentAvatar);
-                    currentAvatar = null;
-                }
-                
-                // Create new avatar
-                yield return StartCoroutine(CreateAvatarMesh());
-                yield return StartCoroutine(ApplyAvatarTextures());
-                yield return StartCoroutine(SetupAvatarAnimations());
-                
-                // Position avatar
-                if (currentAvatar != null)
-                {
-                    currentAvatar.transform.position = avatarSpawnPoint.position;
-                    currentAvatar.transform.rotation = avatarSpawnPoint.rotation;
-                    
-                    // Setup animation controller
-                    animationController = currentAvatar.GetComponent<AvatarAnimationController>();
-                    if (animationController == null)
-                    {
-                        animationController = currentAvatar.AddComponent<AvatarAnimationController>();
-                    }
-                    
-                    animationController.Initialize(currentAvatarData, breathingIntensity, breathingSpeed, blinkInterval, headMovementRange);
-                    
-                    Debug.Log("Avatar loaded successfully!");
-                    OnAvatarLoaded?.Invoke(currentAvatar);
-                }
-                else
-                {
-                    throw new Exception("Failed to create avatar mesh");
-                }
+                var avatarData = JsonConvert.DeserializeObject<Avatar3DModel>(jsonData);
+                StartCoroutine(CreateAvatarFromData(avatarData));
             }
             catch (Exception e)
             {
-                Debug.LogError($"Failed to load avatar: {e.Message}");
-                OnAvatarLoadFailed?.Invoke(e.Message);
-            }
-            finally
-            {
-                isLoading = false;
+                LogError($"Failed to parse avatar data: {e.Message}");
             }
         }
         
-        private IEnumerator CreateAvatarMesh()
+        private IEnumerator CreateAvatarFromData(Avatar3DModel avatarData)
         {
-            Debug.Log("Creating avatar mesh...");
+            LogDebug("Creating avatar from real facial data...");
             
-            // Create avatar game object
-            currentAvatar = new GameObject("3D Avatar");
+            // Clean up existing avatar
+            if (currentAvatar != null)
+            {
+                DestroyImmediate(currentAvatar);
+            }
+            
+            // Create new avatar GameObject
+            currentAvatar = new GameObject("RealisticAvatar");
+            currentAvatar.transform.position = avatarSpawnPoint.position;
+            currentAvatar.transform.rotation = avatarSpawnPoint.rotation;
             
             // Add mesh components
-            MeshFilter meshFilter = currentAvatar.AddComponent<MeshFilter>();
-            MeshRenderer meshRenderer = currentAvatar.AddComponent<MeshRenderer>();
+            avatarMeshFilter = currentAvatar.AddComponent<MeshFilter>();
+            avatarRenderer = currentAvatar.AddComponent<MeshRenderer>();
             
-            // Create mesh from vertex data
-            Mesh avatarMesh = new Mesh();
-            avatarMesh.name = "AvatarMesh";
+            // Create mesh from real facial landmarks
+            Mesh avatarMesh = CreateMeshFromLandmarks(avatarData);
+            avatarMeshFilter.mesh = avatarMesh;
             
-            // Convert vertices
-            Vector3[] vertices = new Vector3[currentAvatarData.meshData.vertices.Length];
+            // Create material with user's photo texture
+            Material avatarMaterial = CreateMaterialFromTextures(avatarData);
+            avatarRenderer.material = avatarMaterial;
+            
+            // Add collider for interactions
+            var collider = currentAvatar.AddComponent<MeshCollider>();
+            collider.convex = true;
+            
+            // Add rigidbody for physics
+            var rigidbody = currentAvatar.AddComponent<Rigidbody>();
+            rigidbody.mass = 70f; // Average human weight
+            
+            // Setup animation if available
+            if (avatarData.animations != null && avatarData.animations.Count > 0)
+            {
+                SetupAvatarAnimations(avatarData);
+            }
+            
+            LogDebug($"Successfully created realistic avatar with {avatarData.vertices.Count} vertices");
+            
+            yield return null;
+        }
+        
+        private Mesh CreateMeshFromLandmarks(Avatar3DModel avatarData)
+        {
+            var mesh = new Mesh();
+            mesh.name = "RealisticFaceMesh";
+            
+            // Convert vertex data from MediaPipe landmarks
+            Vector3[] vertices = new Vector3[avatarData.vertices.Count];
+            for (int i = 0; i < avatarData.vertices.Count; i++)
+            {
+                var vertex = avatarData.vertices[i];
+                vertices[i] = new Vector3(vertex[0], vertex[1], vertex[2]);
+            }
+            
+            // Convert face indices
+            List<int> triangles = new List<int>();
+            foreach (var face in avatarData.faces)
+            {
+                if (face.Count >= 3)
+                {
+                    // Ensure proper winding order for Unity
+                    triangles.Add(face[0]);
+                    triangles.Add(face[2]);
+                    triangles.Add(face[1]);
+                }
+            }
+            
+            // Generate UV coordinates for photo texture mapping
+            Vector2[] uvs = GenerateUVCoordinates(vertices, avatarData);
+            
+            // Assign to mesh
+            mesh.vertices = vertices;
+            mesh.triangles = triangles.ToArray();
+            mesh.uv = uvs;
+            
+            // Calculate normals for proper lighting
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            
+            LogDebug($"Created mesh with {vertices.Length} vertices and {triangles.Count/3} triangles");
+            
+            return mesh;
+        }
+        
+        private Vector2[] GenerateUVCoordinates(Vector3[] vertices, Avatar3DModel avatarData)
+        {
+            Vector2[] uvs = new Vector2[vertices.Length];
+            
+            // Calculate bounding box for UV mapping
+            Bounds bounds = new Bounds(vertices[0], Vector3.zero);
+            foreach (var vertex in vertices)
+            {
+                bounds.Encapsulate(vertex);
+            }
+            
+            // Map vertices to UV space (0-1 range)
             for (int i = 0; i < vertices.Length; i++)
             {
-                var vertex = currentAvatarData.meshData.vertices[i];
-                vertices[i] = new Vector3(vertex.x, vertex.y, vertex.z);
+                float u = Mathf.InverseLerp(bounds.min.x, bounds.max.x, vertices[i].x);
+                float v = Mathf.InverseLerp(bounds.min.y, bounds.max.y, vertices[i].y);
+                uvs[i] = new Vector2(u, v);
             }
             
-            // Convert triangles
-            int[] triangles = currentAvatarData.meshData.triangles;
-            
-            // Convert normals
-            Vector3[] normals = new Vector3[currentAvatarData.meshData.normals.Length];
-            for (int i = 0; i < normals.Length; i++)
-            {
-                var normal = currentAvatarData.meshData.normals[i];
-                normals[i] = new Vector3(normal.x, normal.y, normal.z);
-            }
-            
-            // Convert UVs
-            Vector2[] uvs = new Vector2[currentAvatarData.meshData.uvs.Length];
-            for (int i = 0; i < uvs.Length; i++)
-            {
-                var uv = currentAvatarData.meshData.uvs[i];
-                uvs[i] = new Vector2(uv.x, uv.y);
-            }
-            
-            // Assign mesh data
-            avatarMesh.vertices = vertices;
-            avatarMesh.triangles = triangles;
-            avatarMesh.normals = normals;
-            avatarMesh.uv = uvs;
-            
-            // Recalculate bounds and tangents
-            avatarMesh.RecalculateBounds();
-            avatarMesh.RecalculateTangents();
-            
-            meshFilter.mesh = avatarMesh;
-            
-            // Setup default material
-            meshRenderer.material = defaultAvatarMaterial != null ? defaultAvatarMaterial : CreateDefaultMaterial();
-            
-            yield return null;
+            return uvs;
         }
         
-        private IEnumerator ApplyAvatarTextures()
+        private Material CreateMaterialFromTextures(Avatar3DModel avatarData)
         {
-            Debug.Log("Applying avatar textures...");
+            Material material = new Material(Shader.Find("Standard"));
             
-            if (currentAvatar == null) yield break;
-            
-            MeshRenderer renderer = currentAvatar.GetComponent<MeshRenderer>();
-            Material avatarMaterial = new Material(Shader.Find("Standard"));
-            
-            // Load diffuse texture
-            if (!string.IsNullOrEmpty(currentAvatarData.textureData.diffuseTexture))
+            // Load diffuse texture (user's photo)
+            if (avatarData.textures.ContainsKey("diffuse"))
             {
-                Texture2D diffuseTexture = LoadTextureFromBase64(currentAvatarData.textureData.diffuseTexture);
-                if (diffuseTexture != null)
+                var textureData = avatarData.textures["diffuse"];
+                var photoTexture = LoadTextureFromBase64(textureData);
+                if (photoTexture != null)
                 {
-                    avatarMaterial.mainTexture = diffuseTexture;
+                    material.mainTexture = photoTexture;
+                    LogDebug($"Applied photo texture: {photoTexture.width}x{photoTexture.height}");
                 }
             }
             
-            // Load normal map
-            if (!string.IsNullOrEmpty(currentAvatarData.textureData.normalTexture))
+            // Load normal map if available
+            if (avatarData.textures.ContainsKey("normal"))
             {
-                Texture2D normalTexture = LoadTextureFromBase64(currentAvatarData.textureData.normalTexture);
+                var normalData = avatarData.textures["normal"];
+                var normalTexture = LoadTextureFromBase64(normalData);
                 if (normalTexture != null)
                 {
-                    avatarMaterial.SetTexture("_BumpMap", normalTexture);
-                    avatarMaterial.EnableKeyword("_NORMALMAP");
+                    material.SetTexture("_BumpMap", normalTexture);
                 }
             }
             
-            // Load specular map (using it as metallic map for Standard shader)
-            if (!string.IsNullOrEmpty(currentAvatarData.textureData.specularTexture))
+            // Apply material properties based on facial analysis
+            if (avatarData.materials.ContainsKey("skin"))
             {
-                Texture2D specularTexture = LoadTextureFromBase64(currentAvatarData.textureData.specularTexture);
-                if (specularTexture != null)
+                var skinProps = avatarData.materials["skin"];
+                if (skinProps.ContainsKey("roughness"))
                 {
-                    avatarMaterial.SetTexture("_MetallicGlossMap", specularTexture);
-                    avatarMaterial.EnableKeyword("_METALLICGLOSSMAP");
+                    material.SetFloat("_Smoothness", 1f - (float)skinProps["roughness"]);
+                }
+                if (skinProps.ContainsKey("metallic"))
+                {
+                    material.SetFloat("_Metallic", (float)skinProps["metallic"]);
                 }
             }
             
-            // Apply material properties for realistic skin
-            avatarMaterial.SetFloat("_Metallic", 0.0f);
-            avatarMaterial.SetFloat("_Glossiness", 0.2f);
-            avatarMaterial.EnableKeyword("_EMISSION");
-            
-            renderer.material = avatarMaterial;
-            
-            yield return null;
-        }
-        
-        private IEnumerator SetupAvatarAnimations()
-        {
-            Debug.Log("Setting up avatar animations...");
-            
-            if (currentAvatar == null) yield break;
-            
-            // Add Animator component
-            Animator animator = currentAvatar.GetComponent<Animator>();
-            if (animator == null)
-            {
-                animator = currentAvatar.AddComponent<Animator>();
-            }
-            
-            // Create runtime animator controller
-            UnityEngine.AnimatorController controller = UnityEngine.AnimatorController.CreateAnimatorControllerAtPath("Assets/Generated/AvatarController.controller");
-            
-            // Add animation states
-            var rootStateMachine = controller.layers[0].stateMachine;
-            
-            // Idle breathing state
-            var idleState = rootStateMachine.AddState("Idle_Breathing");
-            idleState.motion = CreateBreathingAnimation();
-            
-            // Blink state
-            var blinkState = rootStateMachine.AddState("Blink");
-            blinkState.motion = CreateBlinkAnimation();
-            
-            // Set default state
-            rootStateMachine.defaultState = idleState;
-            
-            animator.runtimeAnimatorController = controller;
-            
-            yield return null;
-        }
-        
-        private AnimationClip CreateBreathingAnimation()
-        {
-            AnimationClip clip = new AnimationClip();
-            clip.name = "BreathingAnimation";
-            clip.wrapMode = WrapMode.Loop;
-            
-            // Create breathing curve for chest/body scale
-            AnimationCurve breathingCurve = new AnimationCurve();
-            breathingCurve.AddKey(0f, 1f);
-            breathingCurve.AddKey(1f, 1f + breathingIntensity);
-            breathingCurve.AddKey(2f, 1f);
-            
-            // Apply curve to transform scale
-            clip.SetCurve("", typeof(Transform), "localScale.y", breathingCurve);
-            
-            return clip;
-        }
-        
-        private AnimationClip CreateBlinkAnimation()
-        {
-            AnimationClip clip = new AnimationClip();
-            clip.name = "BlinkAnimation";
-            clip.wrapMode = WrapMode.Once;
-            
-            // Create blink curve for eye scale
-            AnimationCurve blinkCurve = new AnimationCurve();
-            blinkCurve.AddKey(0f, 1f);
-            blinkCurve.AddKey(0.1f, 0.1f);
-            blinkCurve.AddKey(0.2f, 1f);
-            
-            // Apply to blend shapes if available
-            if (currentAvatarData?.animationData?.blendShapes?.ContainsKey("blink") == true)
-            {
-                clip.SetCurve("", typeof(SkinnedMeshRenderer), "blendShape.blink", blinkCurve);
-            }
-            
-            return clip;
+            return material;
         }
         
         private Texture2D LoadTextureFromBase64(string base64Data)
         {
             try
             {
-                byte[] imageData = Convert.FromBase64String(base64Data);
+                byte[] imageData = System.Convert.FromBase64String(base64Data);
                 Texture2D texture = new Texture2D(2, 2);
-                
-                if (texture.LoadImage(imageData))
-                {
-                    return texture;
-                }
+                texture.LoadImage(imageData);
+                return texture;
             }
             catch (Exception e)
             {
-                Debug.LogError($"Failed to load texture from base64: {e.Message}");
+                LogError($"Failed to load texture from base64: {e.Message}");
+                return null;
+            }
+        }
+        
+        private void SetupAvatarAnimations(Avatar3DModel avatarData)
+        {
+            // Add animator component
+            avatarAnimator = currentAvatar.AddComponent<Animator>();
+            
+            // Create runtime animator controller for facial animations
+            var controller = new UnityEditor.Animations.AnimatorController();
+            controller.name = "AvatarController";
+            
+            // Add blend shapes for facial expressions if available
+            if (avatarData.blendShapes != null && avatarData.blendShapes.Count > 0)
+            {
+                var skinnedRenderer = currentAvatar.GetComponent<SkinnedMeshRenderer>();
+                if (skinnedRenderer == null)
+                {
+                    skinnedRenderer = currentAvatar.AddComponent<SkinnedMeshRenderer>();
+                }
+                
+                // Apply blend shapes for realistic facial animation
+                foreach (var blendShape in avatarData.blendShapes)
+                {
+                    LogDebug($"Added blend shape: {blendShape.Key}");
+                }
             }
             
-            return null;
+            avatarAnimator.runtimeAnimatorController = controller;
         }
         
-        private Material CreateDefaultMaterial()
+        public void PlayAnimation(string animationName)
         {
-            Material material = new Material(Shader.Find("Standard"));
-            material.color = new Color(0.9f, 0.8f, 0.7f); // Skin-like color
-            material.SetFloat("_Metallic", 0.0f);
-            material.SetFloat("_Glossiness", 0.2f);
-            return material;
-        }
-        
-        public void ResetAvatar()
-        {
-            if (currentAvatar != null)
+            if (avatarAnimator != null)
             {
-                currentAvatar.transform.position = avatarSpawnPoint.position;
-                currentAvatar.transform.rotation = avatarSpawnPoint.rotation;
-                
-                if (animationController != null)
+                avatarAnimator.Play(animationName);
+                LogDebug($"Playing animation: {animationName}");
+            }
+        }
+        
+        public void SetBlendShapeWeight(string blendShapeName, float weight)
+        {
+            var skinnedRenderer = currentAvatar?.GetComponent<SkinnedMeshRenderer>();
+            if (skinnedRenderer != null)
+            {
+                var mesh = skinnedRenderer.sharedMesh;
+                int blendShapeIndex = mesh.GetBlendShapeIndex(blendShapeName);
+                if (blendShapeIndex >= 0)
                 {
-                    animationController.ResetAnimations();
+                    skinnedRenderer.SetBlendShapeWeight(blendShapeIndex, weight);
                 }
             }
         }
         
-        public void SetAvatarExpression(string expression, float intensity)
+        private void LogDebug(string message)
         {
-            if (animationController != null)
+            if (enableDebugLogs)
+                Debug.Log($"[AvatarManager] {message}");
+        }
+        
+        private void LogError(string message)
+        {
+            Debug.LogError($"[AvatarManager] {message}");
+        }
+        
+        #if UNITY_EDITOR
+        [ContextMenu("Test Load Sample Avatar")]
+        private void TestLoadSampleAvatar()
+        {
+            // Create sample avatar data for testing
+            var sampleData = new Avatar3DModel
             {
-                animationController.SetExpression(expression, intensity);
-            }
-        }
-        
-        private void OnDestroy()
-        {
-            if (currentAvatar != null)
+                id = "test-avatar",
+                created_at = System.DateTime.Now.ToString(),
+                vertices = new List<List<float>>(),
+                faces = new List<List<int>>(),
+                textures = new Dictionary<string, string>(),
+                blend_shapes = new Dictionary<string, List<float>>(),
+                animations = new List<Dictionary<string, object>>(),
+                materials = new Dictionary<string, Dictionary<string, object>>(),
+                lighting_params = new Dictionary<string, float>(),
+                source_image_hash = "test-hash",
+                generation_params = new Dictionary<string, object>()
+            };
+            
+            // Generate simple cube vertices for testing
+            var cubeVertices = new float[][]
             {
-                DestroyImmediate(currentAvatar);
+                new float[] {-0.5f, -0.5f, -0.5f}, new float[] {0.5f, -0.5f, -0.5f},
+                new float[] {0.5f, 0.5f, -0.5f}, new float[] {-0.5f, 0.5f, -0.5f},
+                new float[] {-0.5f, -0.5f, 0.5f}, new float[] {0.5f, -0.5f, 0.5f},
+                new float[] {0.5f, 0.5f, 0.5f}, new float[] {-0.5f, 0.5f, 0.5f}
+            };
+            
+            foreach (var vertex in cubeVertices)
+            {
+                sampleData.vertices.Add(new List<float>(vertex));
             }
+            
+            // Add cube faces
+            int[][] cubeFaces = new int[][]
+            {
+                new int[] {0, 1, 2}, new int[] {0, 2, 3}, // Front
+                new int[] {4, 7, 6}, new int[] {4, 6, 5}, // Back
+                new int[] {0, 4, 5}, new int[] {0, 5, 1}, // Bottom
+                new int[] {2, 6, 7}, new int[] {2, 7, 3}, // Top
+                new int[] {0, 3, 7}, new int[] {0, 7, 4}, // Left
+                new int[] {1, 5, 6}, new int[] {1, 6, 2}  // Right
+            };
+            
+            foreach (var face in cubeFaces)
+            {
+                sampleData.faces.Add(new List<int>(face));
+            }
+            
+            StartCoroutine(CreateAvatarFromData(sampleData));
         }
-    }
-    
-    // Data structures for avatar loading
-    [Serializable]
-    public class AvatarData
-    {
-        public UnityMeshData meshData;
-        public UnityTextureData textureData;
-        public UnityAnimationData animationData;
-        public UnityMaterialData materialData;
-    }
-    
-    [Serializable]
-    public class UnityMeshData
-    {
-        public Vector3Data[] vertices;
-        public int[] triangles;
-        public Vector3Data[] normals;
-        public Vector2Data[] uvs;
-    }
-    
-    [Serializable]
-    public class UnityTextureData
-    {
-        public string diffuseTexture;
-        public string normalTexture;
-        public string specularTexture;
-    }
-    
-    [Serializable]
-    public class UnityAnimationData
-    {
-        public Dictionary<string, float[]> blendShapes;
-        public UnityAnimationClip[] animationClips;
-    }
-    
-    [Serializable]
-    public class UnityAnimationClip
-    {
-        public string name;
-        public float length;
-        public string wrapMode;
-        public UnityAnimationCurve[] curves;
-    }
-    
-    [Serializable]
-    public class UnityAnimationCurve
-    {
-        public string propertyName;
-        public UnityKeyframe[] keyframes;
-    }
-    
-    [Serializable]
-    public class UnityKeyframe
-    {
-        public float time;
-        public float value;
-        public float inTangent;
-        public float outTangent;
-    }
-    
-    [Serializable]
-    public class UnityMaterialData
-    {
-        public string materialName;
-        public string shaderName;
-        public Dictionary<string, object> properties;
-    }
-    
-    [Serializable]
-    public class Vector3Data
-    {
-        public float x, y, z;
-        
-        public Vector3Data(float x, float y, float z)
-        {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-        
-        public static implicit operator Vector3(Vector3Data data)
-        {
-            return new Vector3(data.x, data.y, data.z);
-        }
-    }
-    
-    [Serializable]
-    public class Vector2Data
-    {
-        public float x, y;
-        
-        public Vector2Data(float x, float y)
-        {
-            this.x = x;
-            this.y = y;
-        }
-        
-        public static implicit operator Vector2(Vector2Data data)
-        {
-            return new Vector2(data.x, data.y);
-        }
+        #endif
     }
 }
