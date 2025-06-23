@@ -311,13 +311,20 @@ class SceneManager {
         // Create avatar group
         this.avatarModel = new THREE.Group();
         
-        // Head
-        const headGeometry = new THREE.SphereGeometry(0.3, 16, 16);
-        const headMaterial = new THREE.MeshPhongMaterial({ 
-            color: 0xFFDBB3,
-            shininess: 30
-        });
-        const head = new THREE.Mesh(headGeometry, headMaterial);
+        // Create realistic head from user's facial data
+        let head;
+        if (avatarData && avatarData.vertices && avatarData.faces) {
+            head = this.createRealisticHead(avatarData);
+        } else {
+            // Fallback to simple head
+            const headGeometry = new THREE.SphereGeometry(0.3, 16, 16);
+            const headMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0xFFDBB3,
+                shininess: 30
+            });
+            head = new THREE.Mesh(headGeometry, headMaterial);
+        }
+        
         head.position.y = 1.7;
         head.castShadow = true;
         this.avatarModel.add(head);
@@ -387,6 +394,96 @@ class SceneManager {
             leftArm,
             rightArm
         };
+    }
+    
+    createRealisticHead(avatarData) {
+        try {
+            // Create geometry from real facial landmarks
+            const geometry = new THREE.BufferGeometry();
+            
+            // Extract vertex data
+            const vertices = avatarData.vertices;
+            const faces = avatarData.faces;
+            
+            console.log('Creating realistic head with', vertices.length, 'vertices');
+            
+            // Convert vertices to Float32Array
+            const positions = new Float32Array(vertices.length * 3);
+            for (let i = 0; i < vertices.length; i++) {
+                positions[i * 3] = vertices[i][0];
+                positions[i * 3 + 1] = vertices[i][1];
+                positions[i * 3 + 2] = vertices[i][2];
+            }
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            
+            // Convert faces to indices
+            const indices = [];
+            for (let i = 0; i < faces.length; i++) {
+                if (faces[i].length >= 3) {
+                    indices.push(faces[i][0], faces[i][1], faces[i][2]);
+                }
+            }
+            geometry.setIndex(indices);
+            
+            // Add UV coordinates if available
+            if (avatarData.uvs) {
+                const uvs = new Float32Array(avatarData.uvs.length * 2);
+                for (let i = 0; i < avatarData.uvs.length; i++) {
+                    uvs[i * 2] = avatarData.uvs[i][0];
+                    uvs[i * 2 + 1] = avatarData.uvs[i][1];
+                }
+                geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+            }
+            
+            // Calculate normals for proper lighting
+            geometry.computeVertexNormals();
+            
+            // Create material with user's photo texture
+            let material;
+            if (avatarData.textures && avatarData.textures.diffuse) {
+                const textureLoader = new THREE.TextureLoader();
+                const texture = textureLoader.load(
+                    'data:image/png;base64,' + avatarData.textures.diffuse,
+                    () => console.log('Photo texture loaded successfully')
+                );
+                texture.wrapS = THREE.ClampToEdgeWrapping;
+                texture.wrapT = THREE.ClampToEdgeWrapping;
+                texture.flipY = false;
+                
+                material = new THREE.MeshPhongMaterial({
+                    map: texture,
+                    shininess: 30,
+                    side: THREE.DoubleSide
+                });
+            } else {
+                material = new THREE.MeshPhongMaterial({
+                    color: 0xFFDBB3,
+                    shininess: 30,
+                    side: THREE.DoubleSide
+                });
+            }
+            
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            
+            // Scale to appropriate size
+            mesh.scale.set(2, 2, 2);
+            
+            console.log('Successfully created realistic head mesh');
+            return mesh;
+            
+        } catch (error) {
+            console.error('Failed to create realistic head:', error);
+            
+            // Fallback to simple sphere
+            const headGeometry = new THREE.SphereGeometry(0.3, 16, 16);
+            const headMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0xFFDBB3,
+                shininess: 30
+            });
+            return new THREE.Mesh(headGeometry, headMaterial);
+        }
     }
     
     startAvatarAnimations() {

@@ -120,7 +120,11 @@ class PhotoProcessor:
             
         except Exception as e:
             logger.error(f"Avatar generation failed: {e}")
-            raise Exception(f"No face detected in the image. Please upload a clear photo showing your face directly facing the camera.")
+            # Instead of failing, use fallback processing for better user experience
+            if "No face detected" in str(e):
+                return await self._generate_fallback_avatar(image, avatar_id, current_time, image_hash)
+            else:
+                raise Exception(f"Processing failed: {str(e)}")
     
     async def _preprocess_image(self, image: Image.Image) -> Image.Image:
         """Preprocess image for optimal face detection"""
@@ -759,3 +763,34 @@ class PhotoProcessor:
             "skeleton": None,
             "sequences": [{"name": "idle", "duration": 1.0, "keyframes": []}]
         }
+    
+    async def _generate_fallback_avatar(self, image: Image.Image, avatar_id: str, current_time: str, image_hash: str) -> Dict[str, Any]:
+        """Generate fallback avatar when face detection fails but still use the user's photo"""
+        logger.info("Using fallback avatar generation with user photo")
+        
+        # Create simple mesh but use user's photo as texture
+        mesh_data = await self._generate_fallback_mesh(image)
+        textures = await self._generate_basic_textures(image)
+        animations = await self._generate_basic_animations()
+        
+        avatar_data = {
+            "id": avatar_id,
+            "created_at": current_time,
+            "vertices": mesh_data["vertices"],
+            "faces": mesh_data["faces"],
+            "textures": textures,
+            "blend_shapes": animations["blend_shapes"],
+            "skeleton": animations.get("skeleton"),
+            "animations": animations["sequences"],
+            "materials": self._generate_photo_materials({}),
+            "lighting_params": self._generate_lighting_params(),
+            "source_image_hash": image_hash,
+            "generation_params": {
+                "quality": "fallback_with_photo",
+                "style": "user_photo_texture",
+                "method": "fallback_processing",
+                "optimization": "real_time"
+            }
+        }
+        
+        return avatar_data
